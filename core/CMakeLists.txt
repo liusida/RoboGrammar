@@ -41,7 +41,7 @@ set(TINYXML2_ROOT ${PROJECT_SOURCE_DIR}/extern/tinyxml2)
 add_subdirectory(${TINYXML2_ROOT} ${CMAKE_BINARY_DIR}/tinyxml2)
 
 set(ROBOTDESIGN_SOURCES
-    src/bitmap_font.cpp
+    # src/bitmap_font.cpp
     # src/gl_renderer.cpp
     # src/glfw_viewer.cpp
     src/graph_build.cpp
