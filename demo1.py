@@ -1,9 +1,12 @@
 import sys
 import gym
-import environments
+import pyrobotdesign_env
 from train.utils import solve_argv_conflict
 from train.arguments import get_parser
 import pyrobotdesign as rd
+
+opengl = True
+
 
 args_list = ['--env-name', 'RobotLocomotion-v0',
                 '--task', 'RidgedTerrainTask',
@@ -35,11 +38,12 @@ args = parser.parse_args(args_list + sys.argv[1:])
 
 env = gym.make("RobotLocomotion-v0", args=args)
 env.reset()
-# viewer = rd.GLFWViewer()
+if opengl:
+    viewer = rd.GLFWViewer()
 
 while True:
     a = env.action_space.sample() * 100
     obs, reward, done, info = env.step(a)
     print(obs)
-    
-    # viewer.render(env.sim)
+    if opengl:
+        viewer.render(env.sim)
