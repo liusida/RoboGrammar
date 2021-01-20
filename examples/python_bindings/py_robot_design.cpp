@@ -6,7 +6,9 @@ void initEigenGeometry(py::module &m);
 void initGraph(py::module &m);
 void initOptim(py::module &m);
 void initProp(py::module &m);
-// void initRender(py::module &m);
+#ifdef USE_OPENGL
+  void initRender(py::module &m);
+#endif
 void initRobot(py::module &m);
 void initSim(py::module &m);
 void initValue(py::module &m);
@@ -16,7 +18,9 @@ PYBIND11_MODULE(pyrobotdesign, m) {
   initGraph(m);
   initOptim(m);
   initProp(m);
-  // initRender(m);
+#ifdef USE_OPENGL
+  initRender(m);
+#endif
   initRobot(m);
   initSim(m);
   initValue(m);

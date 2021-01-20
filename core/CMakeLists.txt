@@ -18,11 +18,13 @@ file(GLOB_RECURSE BULLET_SOURCES
 add_compile_options(-DEIGEN_DONT_PARALLELIZE)
 set(EIGEN_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/extern/eigen)
 
-# find_package(GLEW 1.13 REQUIRED)
-# find_package(OpenGL REQUIRED COMPONENTS OpenGL)
+if (${OPENGL})
+    find_package(GLEW 1.13 REQUIRED)
+    find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 
-# set(GLFW_ROOT ${PROJECT_SOURCE_DIR}/extern/glfw)
-# add_subdirectory(${GLFW_ROOT} ${CMAKE_BINARY_DIR}/glfw)
+    set(GLFW_ROOT ${PROJECT_SOURCE_DIR}/extern/glfw)
+    add_subdirectory(${GLFW_ROOT} ${CMAKE_BINARY_DIR}/glfw)
+endif()
 
 set(LODEPNG_ROOT ${PROJECT_SOURCE_DIR}/extern/lodepng)
 set(LODEPNG_INCLUDE_DIRS ${LODEPNG_ROOT})
@@ -48,6 +50,15 @@ set(ROBOTDESIGN_SOURCES
     src/sim.cpp
 )
 
+if (${OPENGL})
+    set(ROBOTDESIGN_SOURCES ${ROBOTDESIGN_SOURCES}
+    src/bitmap_font.cpp
+    src/gl_renderer.cpp
+    src/glfw_viewer.cpp
+    src/render.cpp
+    )
+endif()
+
 add_library(${LIBRARY_NAME}
     ${BULLET_SOURCES}
     ${LODEPNG_SOURCES}
@@ -58,22 +69,35 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
     include
     ${BULLET_INCLUDE_DIRS}
     ${EIGEN_INCLUDE_DIRS}
-    # ${GLEW_INCLUDE_DIRS}
-    # ${GLFW_INCLUDE_DIRS}
     ${THREADPOOL_INCLUDE_DIRS}
 )
+if (${OPENGL})
+    target_include_directories(${LIBRARY_NAME} PUBLIC
+        ${GLEW_INCLUDE_DIRS}
+        ${GLFW_INCLUDE_DIRS}
+    )
+    target_link_libraries(${LIBRARY_NAME} PUBLIC
+        OpenGL::GL
+        glfw
+        ${GLEW_LIBRARIES}
+        ${GLFW_LIBRARIES}
+    )
+endif()
 
 target_include_directories(${LIBRARY_NAME} PRIVATE
     ${LODEPNG_INCLUDE_DIRS}
     ${TINYXML2_INCLUDE_DIRS}
 )
 
-# target_link_libraries(${LIBRARY_NAME} PUBLIC
-#     OpenGL::GL
-#     glfw
-#     ${GLEW_LIBRARIES}
-#     ${GLFW_LIBRARIES}
-# )
+if (${OPENGL})
+    target_link_libraries(${LIBRARY_NAME} PUBLIC
+        OpenGL::GL
+        glfw
+        ${GLEW_LIBRARIES}
+        ${GLFW_LIBRARIES}
+    )
+endif()
+
 
 target_link_libraries(${LIBRARY_NAME} PRIVATE
     pegtl

@@ -4,18 +4,36 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(LIBRARY_NAME pyrobotdesign)
 
+if (${OPENGL})
+    add_definitions( -DUSE_OPENGL )
+endif()
+
 set(PYBIND11_ROOT ${PROJECT_SOURCE_DIR}/extern/pybind11)
 add_subdirectory(${PYBIND11_ROOT} ${CMAKE_BINARY_DIR}/pybind11)
-pybind11_add_module(${LIBRARY_NAME}
-    py_eigen_geometry.cpp
-    py_graph.cpp
-    py_optim.cpp
-    py_prop.cpp
-    py_robot.cpp
-    py_robot_design.cpp
-    py_sim.cpp
-    py_value.cpp
-)
+if (${OPENGL})
+    pybind11_add_module(${LIBRARY_NAME}
+        py_eigen_geometry.cpp
+        py_graph.cpp
+        py_optim.cpp
+        py_prop.cpp
+        py_robot.cpp
+        py_robot_design.cpp
+        py_sim.cpp
+        py_value.cpp
+        py_render.cpp
+    )
+else()
+    pybind11_add_module(${LIBRARY_NAME}
+        py_eigen_geometry.cpp
+        py_graph.cpp
+        py_optim.cpp
+        py_prop.cpp
+        py_robot.cpp
+        py_robot_design.cpp
+        py_sim.cpp
+        py_value.cpp
+    )
+endif()
 
 set_target_properties(${LIBRARY_NAME} PROPERTIES
     PREFIX ""
