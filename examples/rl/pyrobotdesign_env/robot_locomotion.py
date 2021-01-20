@@ -2,6 +2,8 @@ import sys, os
 base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../')
 sys.path.append(base_dir)
 sys.path.append(os.path.join(base_dir, 'rl'))
+data_dir = os.path.abspath(os.path.join(__file__,"../../../../data/"))
+os.environ['ROBOT_DESIGN_DATA_DIR'] = f"{data_dir}/"
 
 import numpy as np
 import gym
@@ -15,11 +17,13 @@ from common.common import *
 import tasks
 import pyrobotdesign
 class RobotLocomotionEnv(gym.Env):
-    def __init__(self, args):
+    def __init__(self):
+        default_task = "FlatTerrainTask"
+
         # init task and robot
-        task_class = getattr(tasks, args.task)
+        task_class = getattr(tasks, default_task)
         self.task = task_class()
-        self.robot = build_robot(args)
+        self.robot = build_robot()
         
         # get init pos
         self.robot_init_pos, has_self_collision = presimulate(self.robot)
@@ -49,6 +53,8 @@ class RobotLocomotionEnv(gym.Env):
 
         # init seed
         self.seed()
+
+        self.render_mode = "off"
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -128,11 +134,24 @@ class RobotLocomotionEnv(gym.Env):
         
         done = self.detect_crash()
         
+        self._render()
+        
         return obs, reward, done, {}
         
 
     def render(self, mode="human"):
-        if mode=="human":
+        self.render_mode = mode
+
+    def _render(self):
+        if self.render_mode=="human":
             if not hasattr(self, "viewer"):
                 self.viewer = rd.GLFWViewer()
             self.viewer.render(self.sim)
+
+    def set_task(self, task):
+        # init task and robot
+        task_class = getattr(tasks, task)
+        self.task = task_class()
+
+    def set_robot(self, grammar_file, rule_sequence):
+        self.robot = build_robot(grammar_file, rule_sequence)

@@ -29,13 +29,16 @@ def finalize_robot(robot):
             link.joint_type = rd.JointType.FIXED
             link.joint_color = [1.0, 0.0, 1.0]
         
-def build_robot(args):
-    graphs = rd.load_graphs(args.grammar_file)
+def build_robot(grammar_file = "grammar_apr30.dot", rule_sequence="0,7,1,13,1,2,16,12,13,6,4,19,4,17,5,3,2,16,4,5,18,9,8,9,9,8"):
+    if not os.path.exists(grammar_file):
+        data_dir = os.path.abspath(os.path.join(__file__, '../../../../data/designs/'))
+        grammar_file = os.path.join(data_dir, grammar_file)
+    graphs = rd.load_graphs(grammar_file)
     rules = [rd.create_rule_from_graph(g) for g in graphs]
 
     # rule_sequence = [int(s.strip(",")) for s in args.rule_sequence]
     # change rule_sequence type:
-    rule_sequence = [int(s) for s in args.rule_sequence.split(",")]
+    rule_sequence = [int(s) for s in rule_sequence.split(",")]
 
     graph = make_initial_graph()
     for r in rule_sequence:

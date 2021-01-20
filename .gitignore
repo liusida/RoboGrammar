@@ -12,3 +12,4 @@ trained_models/
 *.so
 to_vacc.sh
 tmp*
+tb
