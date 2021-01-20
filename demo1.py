@@ -40,4 +40,4 @@ while True:
     obs, reward, done, info = env.step(a)
     print(obs)
     # If you did cmake with -DOPENGL, you can enable this:
-    # env.render()
+    env.render()
