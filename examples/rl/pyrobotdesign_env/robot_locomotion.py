@@ -13,7 +13,7 @@ import copy
 from simulation.simulation_utils import *
 from common.common import *
 import tasks
-
+import pyrobotdesign
 class RobotLocomotionEnv(gym.Env):
     def __init__(self, args):
         # init task and robot
@@ -131,5 +131,8 @@ class RobotLocomotionEnv(gym.Env):
         return obs, reward, done, {}
         
 
-
-
+    def render(self, mode="human"):
+        if mode=="human":
+            if not hasattr(self, "viewer"):
+                self.viewer = rd.GLFWViewer()
+            self.viewer.render(self.sim)
