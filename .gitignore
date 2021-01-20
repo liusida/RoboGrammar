@@ -9,3 +9,6 @@ vgcore.*
 trained_models/
 .vscode/
 *.egg-info
+*.so
+to_vacc.sh
+tmp*

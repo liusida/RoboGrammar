@@ -18,11 +18,11 @@ file(GLOB_RECURSE BULLET_SOURCES
 add_compile_options(-DEIGEN_DONT_PARALLELIZE)
 set(EIGEN_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/extern/eigen)
 
-find_package(GLEW 1.13 REQUIRED)
-find_package(OpenGL REQUIRED COMPONENTS OpenGL)
+# find_package(GLEW 1.13 REQUIRED)
+# find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 
-set(GLFW_ROOT ${PROJECT_SOURCE_DIR}/extern/glfw)
-add_subdirectory(${GLFW_ROOT} ${CMAKE_BINARY_DIR}/glfw)
+# set(GLFW_ROOT ${PROJECT_SOURCE_DIR}/extern/glfw)
+# add_subdirectory(${GLFW_ROOT} ${CMAKE_BINARY_DIR}/glfw)
 
 set(LODEPNG_ROOT ${PROJECT_SOURCE_DIR}/extern/lodepng)
 set(LODEPNG_INCLUDE_DIRS ${LODEPNG_ROOT})
@@ -62,8 +62,8 @@ target_include_directories(${LIBRARY_NAME} PUBLIC
     include
     ${BULLET_INCLUDE_DIRS}
     ${EIGEN_INCLUDE_DIRS}
-    ${GLEW_INCLUDE_DIRS}
-    ${GLFW_INCLUDE_DIRS}
+    # ${GLEW_INCLUDE_DIRS}
+    # ${GLFW_INCLUDE_DIRS}
     ${THREADPOOL_INCLUDE_DIRS}
 )
 
@@ -72,12 +72,12 @@ target_include_directories(${LIBRARY_NAME} PRIVATE
     ${TINYXML2_INCLUDE_DIRS}
 )
 
-target_link_libraries(${LIBRARY_NAME} PUBLIC
-    OpenGL::GL
-    glfw
-    ${GLEW_LIBRARIES}
-    ${GLFW_LIBRARIES}
-)
+# target_link_libraries(${LIBRARY_NAME} PUBLIC
+#     OpenGL::GL
+#     glfw
+#     ${GLEW_LIBRARIES}
+#     ${GLFW_LIBRARIES}
+# )
 
 target_link_libraries(${LIBRARY_NAME} PRIVATE
     pegtl
