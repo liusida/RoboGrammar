@@ -16,9 +16,14 @@ def get_parser():
         required=True,
         help='Grammar file (.dot)')
 
+    # parser.add_argument(
+    #     '--rule-sequence',
+    #     nargs='+',
+    #     help='Design rule sequence to apply')
+    # change to a string:
     parser.add_argument(
         '--rule-sequence',
-        nargs='+',
+        type=str,
         help='Design rule sequence to apply')
 
     # logging

@@ -33,7 +33,9 @@ def build_robot(args):
     graphs = rd.load_graphs(args.grammar_file)
     rules = [rd.create_rule_from_graph(g) for g in graphs]
 
-    rule_sequence = [int(s.strip(",")) for s in args.rule_sequence]
+    # rule_sequence = [int(s.strip(",")) for s in args.rule_sequence]
+    # change rule_sequence type:
+    rule_sequence = [int(s) for s in args.rule_sequence.split(",")]
 
     graph = make_initial_graph()
     for r in rule_sequence:
