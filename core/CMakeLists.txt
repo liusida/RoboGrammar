@@ -48,7 +48,7 @@ set(ROBOTDESIGN_SOURCES
     src/graph_io.cpp
     src/graph_rewrite.cpp
     src/optim.cpp
-    src/render.cpp
+    # src/render.cpp
     src/sim.cpp
 )
 
