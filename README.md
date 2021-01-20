@@ -1,3 +1,7 @@
+# Origin
+
+This repository is forked from [allanzhao/RoboGrammar](https://github.com/allanzhao/RoboGrammar)
+
 # Compile without OpenGL
 
 HPC clusters usually don't have OpenGL support, so this repository shows how to install pyrobotdesign without OpenGL.
