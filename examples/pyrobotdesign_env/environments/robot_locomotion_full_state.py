@@ -2,8 +2,6 @@ import sys, os
 base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../')
 sys.path.append(base_dir)
 sys.path.append(os.path.join(base_dir, 'rl'))
-data_dir = os.path.abspath(os.path.join(__file__,"../../../../data/"))
-os.environ['ROBOT_DESIGN_DATA_DIR'] = f"{data_dir}/"
 
 import numpy as np
 import gym
@@ -12,18 +10,16 @@ from gym.utils import seeding
 from os import path
 import copy
 
-from simulation.simulation_utils import *
-from common.common import *
+from pyrobotdesign_env.simulation.simulation_utils import *
+from pyrobotdesign_env.common.common import *
 import tasks
-import pyrobotdesign
-class RobotLocomotionEnv(gym.Env):
-    def __init__(self):
-        default_task = "FlatTerrainTask"
 
+class RobotLocomotionFullEnv(gym.Env):
+    def __init__(self, args):
         # init task and robot
-        task_class = getattr(tasks, default_task)
+        task_class = getattr(tasks, args.task)
         self.task = task_class()
-        self.robot = build_robot()
+        self.robot = build_robot(args)
         
         # get init pos
         self.robot_init_pos, has_self_collision = presimulate(self.robot)
@@ -54,8 +50,6 @@ class RobotLocomotionEnv(gym.Env):
         # init seed
         self.seed()
 
-        self.render_mode = "off"
-
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
@@ -73,8 +67,7 @@ class RobotLocomotionEnv(gym.Env):
 
     def get_obs(self):
         state = get_robot_state(self.sim, self.robot_index)
-        # obs = deepcopy(state)
-        obs = np.hstack((state[0:9], state[10], state[12:])) # remove x, z positions from observation
+        obs = np.hstack((state[0:9], state[9:11], state[12:])) # remove z positions from observation
         return obs
 
     def compute_reward(self):
@@ -134,24 +127,8 @@ class RobotLocomotionEnv(gym.Env):
         
         done = self.detect_crash()
         
-        self._render()
-        
         return obs, reward, done, {}
         
 
-    def render(self, mode="human"):
-        self.render_mode = mode
 
-    def _render(self):
-        if self.render_mode=="human":
-            if not hasattr(self, "viewer"):
-                self.viewer = rd.GLFWViewer()
-            self.viewer.render(self.sim)
 
-    def set_task(self, task):
-        # init task and robot
-        task_class = getattr(tasks, task)
-        self.task = task_class()
-
-    def set_robot(self, grammar_file, rule_sequence):
-        self.robot = build_robot(grammar_file, rule_sequence)

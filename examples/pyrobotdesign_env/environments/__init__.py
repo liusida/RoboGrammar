@@ -2,12 +2,12 @@ from gym.envs.registration import register
 
 register(
     id = 'RobotLocomotion-v0',
-    entry_point = 'pyrobotdesign_env.robot_locomotion:RobotLocomotionEnv',
+    entry_point = 'pyrobotdesign_env.environments.robot_locomotion:RobotLocomotionEnv',
     max_episode_steps=128,
 )
 
 register(
     id = 'RobotLocomotion-v1',
-    entry_point = 'pyrobotdesign_env.robot_locomotion:RobotLocomotionFullEnv',
+    entry_point = 'pyrobotdesign_env.environments.robot_locomotion:RobotLocomotionFullEnv',
     max_episode_steps=128,
 )
