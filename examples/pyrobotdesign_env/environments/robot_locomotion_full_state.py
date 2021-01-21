@@ -2,8 +2,6 @@ import sys, os
 base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../')
 sys.path.append(base_dir)
 sys.path.append(os.path.join(base_dir, 'rl'))
-data_dir = os.path.abspath(os.path.join(__file__,"../../../../data/"))
-os.environ['ROBOT_DESIGN_DATA_DIR'] = f"{data_dir}/"
 
 import numpy as np
 import gym
@@ -12,19 +10,16 @@ from gym.utils import seeding
 from os import path
 import copy
 
-from simulation.simulation_utils import *
-from common.common import *
+from pyrobotdesign_env.simulation.simulation_utils import *
+from pyrobotdesign_env.common.common import *
 import tasks
-import pyrobotdesign
-class RobotLocomotionEnv(gym.Env):
-    def __init__(self, task="FlatTerrainTask", grammar_file = "grammar_apr30.dot", rule_sequence="0,7,1,13,1,2,16,12,13,6,4,19,4,17,5,3,2,16,4,5,18,9,8,9,9,8"):
-        self.render_mode = "off"
-        self.rule_sequence = rule_sequence
 
+class RobotLocomotionFullEnv(gym.Env):
+    def __init__(self, args):
         # init task and robot
-        task_class = getattr(tasks, task)
+        task_class = getattr(tasks, args.task)
         self.task = task_class()
-        self.robot = build_robot(grammar_file=grammar_file, rule_sequence=rule_sequence)
+        self.robot = build_robot(args)
         
         # get init pos
         self.robot_init_pos, has_self_collision = presimulate(self.robot)
@@ -45,16 +40,15 @@ class RobotLocomotionEnv(gym.Env):
         # define action space and observation space
         self.action_dim = self.sim.get_robot_dof_count(self.robot_index)
         self.action_range = np.array([-np.pi, np.pi])
-        self.action_space = spaces.Box(low = np.full(self.action_dim, -1.0, dtype=np.float32), 
-            high = np.full(self.action_dim, 1.0, dtype=np.float32), dtype = np.float32)
+        self.action_space = spaces.Box(low = np.full(self.action_dim, -1.0), 
+            high = np.full(self.action_dim, 1.0), dtype = np.float32)
 
         observation = self.get_obs()
-        self.observation_space = spaces.Box(low = np.full(observation.shape, -np.inf, dtype=np.float32), 
-            high = np.full(observation.shape, np.inf, dtype=np.float32), dtype = np.float32)
+        self.observation_space = spaces.Box(low = np.full(observation.shape, -np.inf), 
+            high = np.full(observation.shape, np.inf), dtype = np.float32)
 
         # init seed
         self.seed()
-
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -73,8 +67,7 @@ class RobotLocomotionEnv(gym.Env):
 
     def get_obs(self):
         state = get_robot_state(self.sim, self.robot_index)
-        # obs = deepcopy(state)
-        obs = np.hstack((state[0:9], state[10], state[12:])) # remove x, z positions from observation
+        obs = np.hstack((state[0:9], state[9:11], state[12:])) # remove z positions from observation
         return obs
 
     def compute_reward(self):
@@ -134,51 +127,8 @@ class RobotLocomotionEnv(gym.Env):
         
         done = self.detect_crash()
         
-        self._render()
-
         return obs, reward, done, {}
         
 
-    def render(self, mode="human"):
-        self.render_mode = mode
 
-    def _render(self):
-        if self.render_mode=="human":
-            if not hasattr(self, "viewer"):
-                self.viewer = rd.GLFWViewer()
-            self.viewer.render(self.sim)
 
-    def set_task(self, task):
-        # init task and robot
-        task_class = getattr(tasks, task)
-        self.task = task_class()
-
-    def set_robot(self, grammar_file, rule_sequence):
-        self.robot = build_robot(grammar_file, rule_sequence)
-        self.rule_sequence = rule_sequence
-
-        # get init pos
-        self.robot_init_pos, has_self_collision = presimulate(self.robot)
-        
-        if has_self_collision:
-            print_error('robot design has self collision')
-
-        # init simulation
-        self.sim = make_sim_fn(self.task, self.robot, self.robot_init_pos)
-        self.robot_index = self.sim.find_robot_index(self.robot)
-
-        # init objective function
-        self.objective_fn = self.task.get_objective_fn()
-
-        # init frame skip
-        self.frame_skip = self.task.interval
-
-        # define action space and observation space
-        self.action_dim = self.sim.get_robot_dof_count(self.robot_index)
-        self.action_range = np.array([-np.pi, np.pi])
-        self.action_space = spaces.Box(low = np.full(self.action_dim, -1.0, dtype=np.float32), 
-            high = np.full(self.action_dim, 1.0, dtype=np.float32), dtype = np.float32)
-
-        observation = self.get_obs()
-        self.observation_space = spaces.Box(low = np.full(observation.shape, -np.inf, dtype=np.float32), 
-            high = np.full(observation.shape, np.inf, dtype=np.float32), dtype = np.float32)
